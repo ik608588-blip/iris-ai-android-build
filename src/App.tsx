@@ -236,6 +236,71 @@ function App() {
       userMessage,
     ]);
 
+    const searchMatch = text.match(
+      /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:(search|find)\s+(google|youtube music|youtube)\s+(?:for\s+)?(.+)|(play|watch|listen to)\s+(.+?)\s+(?:on|in)\s+(youtube music|youtube))\s*[.!?]*$/i
+    );
+
+    if (searchMatch) {
+      let service = "";
+      let query = "";
+
+      if (searchMatch[1]) {
+        service = searchMatch[2].toLowerCase();
+        query = searchMatch[3].trim();
+      } else {
+        service = searchMatch[6].toLowerCase();
+        query = searchMatch[5].trim();
+      }
+
+      const serviceKey =
+        service === "youtube music" ? "youtube_music" : service;
+
+      if (query) {
+        const serviceName =
+          serviceKey === "youtube_music"
+            ? "YouTube Music"
+            : serviceKey === "youtube"
+              ? "YouTube"
+              : "Google";
+
+        try {
+          await AppLauncher.search({
+            service: serviceKey,
+            query,
+            play: Boolean(searchMatch[4]),
+          });
+
+          const reply = searchMatch[4]
+            ? `Opened ${serviceName} results for ${query}. Choose a result to start playback.`
+            : `Searching ${serviceName} for ${query}.`;
+
+          setConversationHistory((prev) => [
+            ...prev,
+            { role: "assistant", content: reply },
+          ]);
+
+          if (voiceEnabled) await speak(reply);
+        } catch (error) {
+          console.error("IRIS search error:", error);
+          const reply =
+            error instanceof Error
+              ? error.message
+              : `I couldn't open ${serviceName} search.`;
+
+          setConversationHistory((prev) => [
+            ...prev,
+            { role: "assistant", content: reply },
+          ]);
+
+          if (voiceEnabled) await speak(reply);
+        } finally {
+          setLoading(false);
+        }
+
+        return;
+      }
+    }
+
     const launchMatch = text.match(
       /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:open|launch|start)\s+(?:the\s+)?(.+?)[.!?]*$/i
     );
