@@ -2672,3 +2672,46 @@ button:focus-visible, textarea:focus-visible, input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .orb-core-halo, .orb-core-sphere, .orb-core-orbit { animation: none !important; }
 }
+
+/* IRIS mobile layout refinement — 2026-10 */
+@media (max-width: 600px) {
+  .page-content { padding-top: 14px; padding-bottom: 112px; }
+  .hero-orb {
+    width: 100%;
+    height: 142px;
+    margin: 0 auto 16px;
+    overflow: hidden;
+  }
+  .iris-orb { width: 124px; height: 124px; }
+  .orb-ring { transform-origin: center; }
+  .orb-ring-one { inset: 5px; }
+  .orb-ring-two { inset: -3px; }
+  .orb-ring-three { inset: -11px; }
+  .hero { padding-top: 8px; }
+  .hero h1 { font-size: clamp(27px, 7.2vw, 34px); line-height: 1.12; }
+  .hero p, .hero-text { font-size: 14px; line-height: 1.55; }
+  .suggestions { margin-top: 18px; }
+  .suggestion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .suggestion-card { min-height: 58px; padding: 12px; font-size: 12px; }
+  .system-cards { margin-top: 14px; }
+  .composer-wrap { z-index: 30; }
+}
+
+/* Board Prep embeds the same checklist as Phase 1; avoid duplicating its summary cards. */
+.board-task-zones .phase1-overview { display: none; }
+.board-task-zones { padding: 14px; }
+.board-task-zones .phase1-section { margin-top: 10px; }
+.board-task-zones .phase1-toolbar { gap: 10px; margin-bottom: 14px; }
+.board-task-zones .phase1-filters { gap: 6px; flex-wrap: wrap; }
+.board-task-zones .phase1-filters button { padding: 8px 11px; font-size: 12px; }
+.board-task-zones .phase1-task { padding: 11px 10px; }
+
+@media (max-width: 600px) {
+  .board-prep-page .page-heading { gap: 10px; }
+  .board-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .board-stat-card { min-height: 112px; padding: 13px; }
+  .board-progress-row { gap: 9px; }
+  .board-progress-item { padding: 13px; }
+  .board-task-zones { margin-top: 16px; padding: 11px; }
+  .board-zones-intro h3 { font-size: 19px; }
+}

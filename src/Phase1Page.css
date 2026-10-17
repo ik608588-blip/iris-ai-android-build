@@ -488,3 +488,25 @@
   .phase1-toolbar { align-items: stretch; flex-direction: column; }
   .phase1-search { width: 100%; }
 }
+
+/* Compact mobile checklist controls while preserving zone colours and task state. */
+@media (max-width: 600px) {
+  .phase1-page { padding: 12px; }
+  .phase1-header { gap: 12px; margin-bottom: 16px; }
+  .phase1-header h1 { font-size: 27px; }
+  .phase1-overview { gap: 8px; margin-bottom: 14px; }
+  .phase1-progress-card, .phase1-subject-card { padding: 13px; border-radius: 14px; }
+  .phase1-progress-top strong { font-size: 25px; }
+  .phase1-progress-ring { width: 46px; height: 46px; }
+  .phase1-toolbar { gap: 9px; margin-bottom: 14px; }
+  .phase1-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .phase1-filters button { padding: 8px 10px; font-size: 12px; }
+  .phase1-search { min-height: 46px; }
+  .phase1-section { border-radius: 17px; margin-bottom: 12px; }
+  .phase1-section-header { padding: 13px; }
+  .phase1-section-body { padding: 4px 9px 10px; }
+  .phase1-task { gap: 10px; padding: 11px 8px; }
+  .phase1-task-content strong { font-size: 13px; line-height: 1.35; }
+  .phase1-task-content small { font-size: 11px; }
+  .phase1-reset { min-height: 42px; padding: 8px 11px; font-size: 13px; }
+}
