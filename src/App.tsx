@@ -602,17 +602,16 @@ const Dashboard = () => (
         <div className="orb-ring orb-ring-two" />
         <div className="orb-ring orb-ring-three" />
 
-        <div className="iris-eye">
-          <div className="eye-glow" />
-
-          <div className="eye-outer">
-            <div className="eye-inner">
-              <div className="eye-pupil" />
-              <div className="eye-highlight" />
-            </div>
+        <div className="orb-core" aria-hidden="true">
+          <div className="orb-core-halo" />
+          <div className="orb-core-sphere">
+            <span className="orb-core-shard shard-one" />
+            <span className="orb-core-shard shard-two" />
+            <span className="orb-core-shard shard-three" />
+            <span className="orb-core-light" />
           </div>
-
-          <div className="eye-scan" />
+          <div className="orb-core-orbit orbit-a" />
+          <div className="orb-core-orbit orbit-b" />
         </div>
 
         <div className="orb-particles">
@@ -1292,6 +1291,15 @@ const Dashboard = () => (
             <strong>{daysRemaining}</strong>
           </div>
         </div>
+
+        <section className="board-task-zones">
+          <div className="board-zones-intro">
+            <p className="eyebrow">SYLLABUS WORKSPACE</p>
+            <h3>Class 10 Task Zones</h3>
+            <p>Continue your saved Phase 1 checklist here. Changes stay synced with the Phase 1 page on this device.</p>
+          </div>
+          <Phase1Page />
+        </section>
 
         <div className="board-challenge-header">
           <div>
