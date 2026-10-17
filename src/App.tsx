@@ -236,79 +236,119 @@ function App() {
       userMessage,
     ]);
 
-    const searchMatch = text.match(
-      /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:(search|find)\s+(google|youtube music|youtube)\s+(?:for\s+)?(.+)|(play|watch|listen to)\s+(.+?)\s+(?:on|in)\s+(youtube music|youtube))\s*[.!?]*$/i
+    const command = text
+      .replace(/^(?:hey\s+iris[, ]*)/i, "")
+      .replace(/^please\s+/i, "")
+      .trim()
+      .replace(/[.!?]+$/, "")
+      .trim();
+
+    let serviceKey = "";
+    let query = "";
+    let isPlayCommand = false;
+
+    // Search service first: "search YouTube for cats"
+    let match = command.match(
+      /^(?:search|find)\s+(google|youtube music|youtube)\s+(?:for\s+)?(.+)$/i
     );
 
-    const defaultMusicMatch = text.match(
-      /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:play|listen to)\s+(.+?)\s*$/i
-    );
+    if (match) {
+      serviceKey = match[1].toLowerCase() === "youtube music"
+        ? "youtube_music"
+        : match[1].toLowerCase();
+      query = match[2].trim();
+    } else {
+      // Search query first: "search cats on YouTube"
+      match = command.match(
+        /^(?:search|find)\s+(.+?)\s+(?:on|in)\s+(google|youtube music|youtube)$/i
+      );
 
-    if (searchMatch || defaultMusicMatch) {
-      let service = "";
-      let query = "";
-      let isPlayCommand = false;
+      if (match) {
+        query = match[1].trim();
+        serviceKey = match[2].toLowerCase() === "youtube music"
+          ? "youtube_music"
+          : match[2].toLowerCase();
+      } else {
+        // Play/watch/listen with a specified service
+        match = command.match(
+          /^(play|watch|listen to)\s+(.+?)\s+(?:on|in)\s+(youtube music|youtube)$/i
+        );
 
-      if (searchMatch && searchMatch[1]) {
-        service = searchMatch[2].toLowerCase();
-        query = searchMatch[3].trim();
-      } else if (searchMatch) {
-        service = searchMatch[6].toLowerCase();
-        query = searchMatch[5].trim();
-        isPlayCommand = true;
-      } else if (defaultMusicMatch) {
-        service = "youtube music";
-        query = defaultMusicMatch[1].trim();
-        isPlayCommand = true;
-      }
+        if (match) {
+          isPlayCommand = true;
+          query = match[2].trim();
+          serviceKey = match[3].toLowerCase() === "youtube music"
+            ? "youtube_music"
+            : "youtube";
+        } else {
+          // Unspecified "play ..." defaults to YouTube Music
+          match = command.match(
+            /^(?:play|listen to)\s+(.+)$/i
+          );
 
-      const serviceKey =
-        service === "youtube music" ? "youtube_music" : service;
+          if (match) {
+            isPlayCommand = true;
+            query = match[1].trim();
+            serviceKey = "youtube_music";
+          } else {
+            // Natural wording: "Google cats", "YouTube search cats"
+            match = command.match(
+              /^(google|youtube music|youtube)\s+(?:search\s+)?(.+)$/i
+            );
 
-      if (query) {
-        const serviceName =
-          serviceKey === "youtube_music"
-            ? "YouTube Music"
-            : serviceKey === "youtube"
-              ? "YouTube"
-              : "Google";
-
-        try {
-          await AppLauncher.search({
-            service: serviceKey,
-            query,
-            play: isPlayCommand,
-          });
-
-          const reply = isPlayCommand
-            ? `Opened ${serviceName} results for ${query}. Choose a result to start playback.`
-            : `Searching ${serviceName} for ${query}.`;
-
-          setConversationHistory((prev) => [
-            ...prev,
-            { role: "assistant", content: reply },
-          ]);
-
-          if (voiceEnabled) await speak(reply);
-        } catch (error) {
-          console.error("IRIS search error:", error);
-          const reply =
-            error instanceof Error
-              ? error.message
-              : `I couldn't open ${serviceName} search.`;
-
-          setConversationHistory((prev) => [
-            ...prev,
-            { role: "assistant", content: reply },
-          ]);
-
-          if (voiceEnabled) await speak(reply);
-        } finally {
-          setLoading(false);
+            if (match) {
+              serviceKey = match[1].toLowerCase() === "youtube music"
+                ? "youtube_music"
+                : match[1].toLowerCase();
+              query = match[2].trim();
+            }
+          }
         }
-
-        return;
       }
+    }
+
+    if (serviceKey && query) {
+      const serviceName =
+        serviceKey === "youtube_music"
+          ? "YouTube Music"
+          : serviceKey === "youtube"
+            ? "YouTube"
+            : "Google";
+
+      try {
+        await AppLauncher.search({
+          service: serviceKey,
+          query,
+          play: isPlayCommand,
+        });
+
+        const reply = isPlayCommand
+          ? `Opened ${serviceName} results for ${query}. Select a result to start playback.`
+          : `Searching ${serviceName} for ${query}.`;
+
+        setConversationHistory((prev) => [
+          ...prev,
+          { role: "assistant", content: reply },
+        ]);
+
+        if (voiceEnabled) await speak(reply);
+      } catch (error) {
+        console.error("IRIS search error:", error);
+        const reply = error instanceof Error
+          ? error.message
+          : `I couldn't open ${serviceName} search.`;
+
+        setConversationHistory((prev) => [
+          ...prev,
+          { role: "assistant", content: reply },
+        ]);
+
+        if (voiceEnabled) await speak(reply);
+      } finally {
+        setLoading(false);
+      }
+
+      return;
     }
 
     const launchMatch = text.match(
