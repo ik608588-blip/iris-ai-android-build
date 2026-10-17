@@ -307,6 +307,33 @@ function App() {
       }
     }
 
+if (
+  /^(?:play|listen to)\s+music$/i.test(command)
+) {
+  try {
+    await AppLauncher.open({ app: "YouTube Music" });
+
+    const reply = "Opening YouTube Music. Choose a song to play.";
+    setConversationHistory((prev) => [
+      ...prev,
+      { role: "assistant", content: reply },
+    ]);
+
+    if (voiceEnabled) await speak(reply);
+  } catch (error) {
+    const reply = "I couldn't open YouTube Music.";
+    setConversationHistory((prev) => [
+      ...prev,
+      { role: "assistant", content: reply },
+    ]);
+    if (voiceEnabled) await speak(reply);
+  } finally {
+    setLoading(false);
+  }
+
+  return;
+}
+
     if (serviceKey && query) {
       const serviceName =
         serviceKey === "youtube_music"

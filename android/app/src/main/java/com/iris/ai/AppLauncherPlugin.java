@@ -77,7 +77,11 @@ public class AppLauncherPlugin extends Plugin {
         String service = call.getString("service", "").trim()
                 .toLowerCase(Locale.ROOT);
         String query = call.getString("query", "").trim();
-        boolean play = call.getBoolean("play", false);
+        boolean openMusicHome = service.equals("youtube_music")
+        && (query.equalsIgnoreCase("music")
+        || query.equalsIgnoreCase("open music")
+        || query.equalsIgnoreCase("youtube music home"));
+boolean play = call.getBoolean("play", false);
 
         if (query.isEmpty()) {
             call.reject("Please provide something to search for.");
@@ -91,9 +95,9 @@ public class AppLauncherPlugin extends Plugin {
                 url = "https://www.google.com/search?q=" + Uri.encode(query);
                 break;
             case "youtube":
-                url = "https://www.youtube.com/results?search_query="
-                        + Uri.encode(query);
-                break;
+url = openMusicHome
+        ? "https://music.youtube.com/"
+        : "https://music.youtube.com/search?q=" + Uri.encode(query);                break;
             case "youtube_music":
                 url = "https://music.youtube.com/search?q=" + Uri.encode(query);
                 break;
@@ -102,7 +106,7 @@ public class AppLauncherPlugin extends Plugin {
                 return;
         }
 
-        try {
+       try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
