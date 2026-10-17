@@ -1,3 +1,4 @@
+import { AppLauncher } from "./appLauncher";
 import { apiUrl } from "./api";
 import {
   useEffect,
@@ -234,6 +235,66 @@ function App() {
       ...prev,
       userMessage,
     ]);
+
+    const launchMatch = text.match(
+      /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:open|launch|start)\s+(?:the\s+)?(.+?)[.!?]*$/i
+    );
+
+    if (launchMatch) {
+      const requestedApp = launchMatch[1]
+        .trim()
+        .replace(/[.!?]+$/, "")
+        .replace(/\s+(?:app|application)$/i, "")
+        .trim();
+
+      const appAliases: Record<string, string> = {
+        chrome: "Chrome",
+        browser: "Chrome",
+        youtube: "YouTube",
+        yt: "YouTube",
+        settings: "Settings",
+        whatsapp: "WhatsApp",
+        instagram: "Instagram",
+        termux: "Termux",
+      };
+
+      const normalizedApp = requestedApp.toLowerCase().replace(/\s+/g, "");
+
+      if (appAliases[normalizedApp]) {
+        const appName = appAliases[normalizedApp];
+
+        try {
+          const result = await AppLauncher.open({ app: normalizedApp });
+          const reply = result.success
+            ? `Requested Android to open ${appName}.`
+            : `I couldn't open ${appName}.`;
+
+          setConversationHistory((prev) => [
+            ...prev,
+            { role: "assistant", content: reply },
+          ]);
+
+          if (voiceEnabled) await speak(reply);
+        } catch (error) {
+          console.error("IRIS app launch error:", error);
+          const reply =
+            error instanceof Error
+              ? error.message
+              : `I couldn't open ${appName}. Check that it is installed.`;
+
+          setConversationHistory((prev) => [
+            ...prev,
+            { role: "assistant", content: reply },
+          ]);
+
+          if (voiceEnabled) await speak(reply);
+        } finally {
+          setLoading(false);
+        }
+
+        return;
+      }
+    }
 
     try {
       const response = await fetch(apiUrl("/api/chat"), {
