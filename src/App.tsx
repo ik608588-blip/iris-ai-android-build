@@ -1,3 +1,4 @@
+import { apiUrl } from "./api";
 import {
   useEffect,
   useRef,
@@ -127,7 +128,7 @@ function App() {
     try {
       setSpeaking(true);
 
-      const response = await fetch("/api/tts", {
+      const response = await fetch(apiUrl("/api/tts"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -235,7 +236,7 @@ function App() {
     ]);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(apiUrl("/api/chat"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -860,7 +861,7 @@ const Dashboard = () => (
         }
 
         const response = await fetch(
-          "http://127.0.0.1:3001/api/board-prep",
+          apiUrl("/api/board-prep"),
           {
             method: "POST",
             headers: {
@@ -1274,7 +1275,7 @@ const Dashboard = () => (
         setLoadingMemories(true);
         setMemoryError("");
 
-        const response = await fetch("http://127.0.0.1:3001/api/memories");
+        const response = await fetch(apiUrl("/api/memories"));
 
         if (!response.ok) {
           throw new Error("Failed to load memories");
@@ -1316,8 +1317,8 @@ const Dashboard = () => (
         setMemoryError("");
 
         const endpoint = editingId
-          ? `http://127.0.0.1:3001/api/memories/${editingId}`
-          : "http://127.0.0.1:3001/api/memories";
+          ? apiUrl(`/api/memories/${editingId}`)
+          : apiUrl("/api/memories");
 
         const response = await fetch(endpoint, {
           method: editingId ? "PUT" : "POST",
@@ -1366,7 +1367,7 @@ const Dashboard = () => (
 
       try {
         const response = await fetch(
-          `http://127.0.0.1:3001/api/memories/${id}`,
+          apiUrl(`/api/memories/${id}`),
           {
             method: "DELETE",
           }
@@ -1395,7 +1396,7 @@ const Dashboard = () => (
     const toggleMemory = async (memory: Memory) => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:3001/api/memories/${memory.id}`,
+          apiUrl(`/api/memories/${memory.id}`),
           {
             method: "PUT",
             headers: {
@@ -1440,7 +1441,7 @@ const Dashboard = () => (
 
       try {
         const response = await fetch(
-          "http://127.0.0.1:3001/api/memories",
+          apiUrl("/api/memories"),
           {
             method: "DELETE",
           }
