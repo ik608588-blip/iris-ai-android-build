@@ -240,16 +240,26 @@ function App() {
       /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:(search|find)\s+(google|youtube music|youtube)\s+(?:for\s+)?(.+)|(play|watch|listen to)\s+(.+?)\s+(?:on|in)\s+(youtube music|youtube))\s*[.!?]*$/i
     );
 
-    if (searchMatch) {
+    const defaultMusicMatch = text.match(
+      /^(?:hey\s+iris[, ]*)?(?:please\s+)?(?:play|listen to)\s+(.+?)\s*$/i
+    );
+
+    if (searchMatch || defaultMusicMatch) {
       let service = "";
       let query = "";
+      let isPlayCommand = false;
 
-      if (searchMatch[1]) {
+      if (searchMatch && searchMatch[1]) {
         service = searchMatch[2].toLowerCase();
         query = searchMatch[3].trim();
-      } else {
+      } else if (searchMatch) {
         service = searchMatch[6].toLowerCase();
         query = searchMatch[5].trim();
+        isPlayCommand = true;
+      } else if (defaultMusicMatch) {
+        service = "youtube music";
+        query = defaultMusicMatch[1].trim();
+        isPlayCommand = true;
       }
 
       const serviceKey =
@@ -267,10 +277,10 @@ function App() {
           await AppLauncher.search({
             service: serviceKey,
             query,
-            play: Boolean(searchMatch[4]),
+            play: isPlayCommand,
           });
 
-          const reply = searchMatch[4]
+          const reply = isPlayCommand
             ? `Opened ${serviceName} results for ${query}. Choose a result to start playback.`
             : `Searching ${serviceName} for ${query}.`;
 
